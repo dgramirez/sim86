@@ -413,46 +413,27 @@ decode_mov(u8 opcode_dw,
            void *file,
            buf8 *b)
 {
-	// Note: fgetc returns an integer, and the EOF is a constant value.
-	static const char *pszReg[] = {
-		"al", "cl", "dl", "bl",
-		"ah", "ch", "dh", "bh",
-		"ax", "cx", "dx", "bx",
-		"sp", "bp", "si", "di"
-	};
+	buf8_append(b, s8("mov "));
+	if (flag_equ(opcode_dw, MOV_MASK_OPCODE_ITORG))
+		return mov_immed_to_reg(opcode_dw & 0x0F, file, b);
 
-	int mod_reg_rm;
-	unsigned char mod;
-	unsigned char reg;
-	unsigned char rm;
-	s8 bytes;
+	if (flag_equ(opcode_dw, MOV_MASK_OPCODE_ITORM))
+		return mov_immed_to_rm(opcode_dw & 0x01, file, b);
 
-	bytes.data = (u8*)&mod_reg_rm;
-	bytes.len = 1;
-	os_readfile(&bytes, file, 1);
-
-	mod = mod_reg_rm & MASK_B2_MODE;
-	reg = ((mod_reg_rm & MASK_B2_REG) >> 3) | ((opcode_dw & 1) << 3);
-
-	if (mod == MASK_MODE_REG) {
-		rm  = (mod_reg_rm & MASK_B2_RM) | ((opcode_dw & 1) << 3);
-		if (!(opcode_dw & MASK_B1_D) && (reg - rm)) {
-			reg ^= rm;
-			rm ^= reg;
-			reg ^= rm;
-		}
-
-		buf8_append(b, s8("mov "));
-		buf8_appendcstr(b, (char*)pszReg[reg]);
-		buf8_appendbyte(b,','); 
-		buf8_appendbyte(b,' '); 
-		buf8_appendcstr(b, (char*)pszReg[rm]);
-		buf8_appendlf(b);
-
-		return SIM86_OK;
+	if (flag_equ(opcode_dw, MOV_MASK_OPCODE_ACCUM)) {
+		return mov_memory_tofrom_accumulator((opcode_dw & MOV_MASK_D) >> 1,
+		                                     (opcode_dw & MOV_MASK_W),
+		                                     file,
+		                                     b);
 	}
 
-	return SIM86_NOT_IMPLEMENTED;
+	if (flag_equ(opcode_dw, MOV_MASK_OPCODE_SEGMT))
+		return SIM86_NOT_IMPLEMENTED;
+
+	return mov_regrm_tofrom_reg((opcode_dw & MOV_MASK_D) >> 1,
+	                            (opcode_dw & MOV_MASK_W),
+	                            file,
+	                            b);
 }
 
 local int

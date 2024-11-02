@@ -14,7 +14,7 @@ local void *
 std_openfile(char *filepath);
 
 local b32
-std_readfile(s8 *out,
+std_readfile(u8 *out,
              void *file,
              usz size);
 

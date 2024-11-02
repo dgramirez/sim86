@@ -25,10 +25,10 @@ typedef int16_t   i16;
 typedef int32_t   i32;
 typedef ptrdiff_t isz;
 
-typedef float f32;
+typedef float  f32;
 typedef double f64;
 
-typedef int8_t     c8;
+typedef char       c8;
 typedef uint8_t  byte;
 typedef uint16_t  c16;
 typedef int32_t   b32;
@@ -57,7 +57,7 @@ typedef void *
 (*pfn_osopenfile)(char *filepath);
 
 typedef b32
-(*pfn_osreadfile)(s8 *out,
+(*pfn_osreadfile)(u8 *out,
                   void *file,
                   usz size);
 
@@ -78,7 +78,7 @@ stub_openfile(char *filepath)
 }
 
 local b32
-stub_readfile(s8 *out,
+stub_readfile(u8 *out,
               void *file,
               usz size)
 {

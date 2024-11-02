@@ -19,7 +19,6 @@ i8086_main(int argc,
 	b32 err;
 	s8 mode;
 	u8 opcode;
-	s8 s8opcode;
 
 	err = validate_pfn(b,
 	                   (void*)os_write,
@@ -75,8 +74,6 @@ i8086_main(int argc,
 		return SIM86_PANIC;
 	}
 
-	s8opcode.data = &opcode;
-	s8opcode.len = 1;
 	if (s8eq(mode, s8("decode"))) {
 		buf8_appendbyte(b, ';');
 		buf8_appendbyte(b, ' ');
@@ -88,7 +85,7 @@ i8086_main(int argc,
 		buf8_appendlf(b);
 		buf8_appendlf(b);
 
-		while (!os_readfile(&s8opcode, file, 1)) {
+		while (!os_readfile(&opcode, file, 1)) {
 			if (i8086_fn_decodes[opcode](opcode, file, b)) {
 				buf8_flush(b);
 

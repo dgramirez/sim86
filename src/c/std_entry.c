@@ -45,12 +45,14 @@ std_openfile(char *filepath)
 }
 
 local b32
-std_readfile(s8 *out,
+std_readfile(u8 *out,
              void *file,
              usz count)
 {
-	count = imin(out->len, count);
-	fread(out->data, sizeof(char), count, (FILE*)file);
+	if (!count)
+		return 0;
+
+	fread(out, sizeof(char), count, (FILE*)file);
 	return feof((FILE*)file) || ferror((FILE*)file);
 }
 

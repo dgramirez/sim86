@@ -3,6 +3,7 @@
 
 // System (For types.h)
 #include <stdint.h>
+#include <stddef.h>
 
 // Defines & Types
 #include "define.h"
@@ -12,6 +13,7 @@
 #include "buffer.h"
 
 // Program Functionality (C Files)
+#include "i8086_decode_helpers.h"
 #include "i8086_decode.c"
 #include "i8086.c"
 

@@ -76,7 +76,7 @@ buf8_append(buf8 *b,
 
 local void
 buf8_appendcstr(buf8 *b,
-                char *cstr)
+                const char *cstr)
 {
 	s8 str;
 
@@ -98,7 +98,7 @@ buf8_appendbyte(buf8 *b,
 local void
 buf8_appendlf(buf8 *b)
 {
-	#if defined _WIN32
+	#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 		buf8_appendbyte(b, '\r'); // CR
 	#endif
 	buf8_appendbyte(b, '\n'); // LF
@@ -113,7 +113,7 @@ buf8_appendcrlf(buf8 *b)
 
 local void
 buf8_appendisz(buf8 *b,
-           isz x)
+               isz x)
 {
 	u8 tmp[32] = {0};
 	s8 input;
@@ -140,7 +140,7 @@ buf8_appendisz(buf8 *b,
 
 local void
 buf8_appendusz(buf8 *b,
-           usz x)
+               usz x)
 {
 	u8 tmp[32] = {0};
 	s8 input;
@@ -160,7 +160,7 @@ buf8_appendusz(buf8 *b,
 
 local void
 buf8_appendhex(buf8 *b,
-           usz x)
+               usz x)
 {
 	static const u8 hex_table[] = {
 		'0', '1', '2', '3',
@@ -190,7 +190,7 @@ buf8_appendhex(buf8 *b,
 
 local void
 buf8_appendf64(buf8 *b,
-           double d) // [Insert Joke Here.]
+               double d) // [Insert Joke Here.]
 {
 	usz integral;
 	usz fractional; 

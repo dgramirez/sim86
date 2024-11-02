@@ -18,13 +18,14 @@ local void
 win32_print(s8 s);
 
 local void *
-win32_getargs(i32 *argc, char **argv);
+win32_getargs(i32 *argc,
+              char **argv);
 
 local void *
 win32_openfile(char *filepath);
 
 local b32
-win32_readfile(s8 *out,
+win32_readfile(u8 *out,
                void *file,
                usz size);
 

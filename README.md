@@ -1,18 +1,19 @@
 ## 8086 Decoder ##
 (Under Development)
 
-In the current state of this repository, this is an i8086 decoder that only decodes mov. I will be following
-the [Computer Enhance] [1] class, which has the students do a simple 8086 /8088 simulator. This repository
-will be updated for each homework that I've completed, and perhaps more.
+In the current state of this repository, this is an i8086 decoder that only
+decodes mov. I will be following the [Computer Enhance] [1] class, which
+has the students do a simple 8086 /8088 simulator. This repository will be
+updated for each homework that I've completed, and perhaps more.
+
+Latest Update: 2. Decoding Multiple Instructions and Suffixes
 
 ## Build ##
-Currently, Windows is the only platform with a build script.
+Currently, Windows is the only platform with a build script. You can double
+click on build.bat inside the misc directory to get a debug-release build
+right away (sim86/out/win32-xxxxx/debrel).
 
-Command Prompt:
-> cd misc  
-> build
-
-To build:  
+For further builds, go into the misc directory and use the command prompt:
 > build [configuration] [platform-compiler]
 > <br />  
 > [Configuration]  
@@ -26,7 +27,7 @@ To build:
 > **win32-msvc** - Win32 API using vcvarsall.bat  
 > **win32-zigcc** - Win32 API using zig cc
 
-## Command Line ##
+## sim86 Command Line ##
 `sim86 decode [i8086 binary filepath]`
 
 This will decode the binary and print it onto the screen.
@@ -56,3 +57,4 @@ This will decode the binary and print it onto the screen.
 * Note - I am banking that the standard library version covers libc and musl. Unfortunately: *Untested*.
 
 [1]: https://www.computerenhance.com "Computer Enhance"
+

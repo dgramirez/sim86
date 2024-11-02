@@ -3,7 +3,6 @@
 void
 _start()
 {
-
 	buf8 b = {0};
 	s8 s8tmp = {0};
 	c8 *argv[3];
@@ -67,15 +66,17 @@ win32_openfile(char *filepath)
 }
 
 local b32
-win32_readfile(s8 *out,
+win32_readfile(u8 *out,
                void *file,
-               usz size)
+               usz count)
 {
 	BOOL res;
 	DWORD written;
 
-	size = imin(size, out->len);
-	res = ReadFile((HANDLE)file, out->data, (u32)size, &written, NULL);
+	if (!count)
+		return 0;
+
+	res = ReadFile((HANDLE)file, out, (u32)count, &written, NULL);
 
 	if (res && !written)
 		return hit_eof;
@@ -119,7 +120,9 @@ win32_pause()
 }
 
 local void*
-win32_getargs(i32 *argc, char **argv) {
+win32_getargs(i32 *argc,
+              char **argv)
+{
 	buf8 bargv = {0};
 	LPWSTR *argvw;
 
