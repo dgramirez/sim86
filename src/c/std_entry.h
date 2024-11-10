@@ -15,6 +15,7 @@ std_openfile(char *filepath);
 
 local b32
 std_readfile(u8 *out,
+             u16 *ip,
              void *file,
              usz size);
 

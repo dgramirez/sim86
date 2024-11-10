@@ -67,12 +67,14 @@ win32_openfile(char *filepath)
 
 local b32
 win32_readfile(u8 *out,
+               u16 *ip,
                void *file,
                usz count)
 {
 	BOOL res;
 	DWORD written;
 
+	*ip += (u16)count;
 	if (!count)
 		return 0;
 

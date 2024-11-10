@@ -46,9 +46,11 @@ std_openfile(char *filepath)
 
 local b32
 std_readfile(u8 *out,
+             u16 *ip,
              void *file,
              usz count)
 {
+	*ip += (u16)count;
 	if (!count)
 		return 0;
 

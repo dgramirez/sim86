@@ -7,12 +7,19 @@
 #define persistent static
 #define KB(x) ((x) << 10)
 #define MB(x) ((x) << 20)
+#define swap(v1, v2)    \
+	if ((v1) != (v2)) { \
+		(v1) ^= (v2);   \
+		(v2) ^= (v1);   \
+		(v1) ^= (v2);   \
+	}
 
 #define flag_set(x, f) ((x) |= (f))
 #define flag_rem(x, f) ((x) &= (~(f)))
 #define flag_tog(x, f) ((x) ^= (f))
 #define flag_has(x, f) ((x) & (f))
 #define flag_equ(x, f) (((x) & (f)) == (f))
+#define flag_neq(x, f) (((x) & (f)) != (f))
 
 #define countof(a) (usz)(sizeof(a) / sizeof(*(a)))
 #define lengthof(s) (countof(s) - 1)
@@ -28,9 +35,16 @@
 
 // TODO: Fix this Problem for x86 Platforms!
 #define isinf(x) (((x) & 0x7FF0000000000000) == 0x7FF0000000000000)
-#define isnan(x) (((x) & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000)
+#define isnan(x) (((x) & 0x7FFFFFFFFFFFFFFF)  > 0x7FF0000000000000)
 
 #define hit_eof 1
+
+#if defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
+	#define EXE_ARCH 32
+#endif
+#if defined(__x86_64__) || defined(_M_X64)
+	#define EXE_ARCH 64
+#endif
 
 typedef enum {
 	SIM86_OK = 0,

@@ -2,922 +2,1221 @@
 #define SIM86_SRC_C_8086_DECODE_C
 
 local int
-decode_panic(u8 opcode_dw,
+decode_panic(BitNamesForEncodings *bits,
              void *file,
              buf8 *b)
 {
-	unref(opcode_dw);
+	unref(bits);
 	unref(file);
 	unref(b);
 	return SIM86_PANIC;
 }
 
 local int
-decode_add(u8 opcode_dw,
+decode_add(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("add "));
+
+	if (flag_equ(bits->opcode, MASK_ACCUM))
+		return decode_dasm_accum_from_immed(bits, file, b);
+
+	bits->ds = bits->opcode & MASK_D;
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_push(u8 opcode_dw,
+decode_push(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("push "));
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	if (flag_equ(bits->opcode, MASK_PUSH_REG))
+		print_dasm_reg(1, bits->opcode & MASK_REG_ALT, b);
+	else {
+		bits->reg = (bits->opcode & MASK_SR) >> SHIFT_SR;
+		print_dasm_sr(bits->reg, b);
+	}
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_pop(u8 opcode_dw,
+decode_pop(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("pop "));
+
+	if (flag_equ(bits->opcode, MASK_POP_RM))
+		return decode_dasm_rm_solo(bits, file, b);
+
+	if (flag_equ(bits->opcode, MASK_POP_REG))
+		print_dasm_reg(1, (bits->opcode & MASK_REG_ALT), b);
+	else {
+		bits->reg = (bits->opcode & MASK_SR) >> SHIFT_SR;
+		print_dasm_sr(bits->reg, b);
+	}
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_or(u8 opcode_dw,
+decode_or(BitNamesForEncodings *bits,
           void *file,
           buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("or "));
+
+	if (flag_equ(bits->opcode, MASK_ACCUM))
+		return decode_dasm_accum_from_immed(bits, file, b);
+
+	bits->ds = bits->opcode & MASK_D;
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_adc(u8 opcode_dw,
+decode_adc(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("adc "));
+
+	if (flag_equ(bits->opcode, MASK_ACCUM))
+		return decode_dasm_accum_from_immed(bits, file, b);
+
+	bits->ds = bits->opcode & MASK_D;
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_sbb(u8 opcode_dw,
+decode_sbb(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("sbb "));
+
+	if (flag_equ(bits->opcode, MASK_ACCUM))
+		return decode_dasm_accum_from_immed(bits, file, b);
+
+	bits->ds = bits->opcode & MASK_D;
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_and(u8 opcode_dw,
+decode_and(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("and "));
+
+	if (flag_equ(bits->opcode, MASK_ACCUM))
+		return decode_dasm_accum_from_immed(bits, file, b);
+
+	bits->ds = bits->opcode & MASK_D;
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_seg(u8 opcode_dw,
+decode_seg(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
 	unref(file);
 	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	// Note - This value will be subtracted in print functions that uses
+	//        it.
+	bits->sgmt = ((bits->opcode & MASK_SR) >> SHIFT_SR) + 1 ;
+	return SIM86_OK;
 }
 
 local int
-decode_daa(u8 opcode_dw,
+decode_daa(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("daa"));
+	unref(bits);
 	unref(file);
 	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_sub(u8 opcode_dw,
+decode_sub(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("sub "));
+
+	if (flag_equ(bits->opcode, MASK_ACCUM))
+		return decode_dasm_accum_from_immed(bits, file, b);
+
+	bits->ds = bits->opcode & MASK_D;
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_das(u8 opcode_dw,
+decode_das(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("das"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_xor(u8 opcode_dw,
+decode_xor(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("xor "));
+
+	if (flag_equ(bits->opcode, MASK_ACCUM))
+		return decode_dasm_accum_from_immed(bits, file, b);
+
+	bits->ds = bits->opcode & MASK_D;
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_aaa(u8 opcode_dw,
+decode_aaa(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("aaa"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_cmp(u8 opcode_dw,
+decode_cmp(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("cmp "));
+
+	if (flag_equ(bits->opcode, MASK_ACCUM))
+		return decode_dasm_accum_from_immed(bits, file, b);
+
+	bits->ds = bits->opcode & MASK_D;
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_aas(u8 opcode_dw,
+decode_aas(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("aas"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_inc(u8 opcode_dw,
+decode_inc(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("inc "));
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendcstr(b, reg_field_enc[(bits->opcode & 0x7) | 0x08]);
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_dec(u8 opcode_dw,
+decode_dec(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("dec "));
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendcstr(b, reg_field_enc[(bits->opcode & 0x7) | 0x08]);
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_jo(u8 opcode_dw,
+decode_jo(BitNamesForEncodings *bits,
           void *file,
           buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jo "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jno(u8 opcode_dw,
+decode_jno(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jno "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jb_jnae(u8 opcode_dw,
+decode_jb_jnae(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jb "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jnb_jae(u8 opcode_dw,
+decode_jnb_jae(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jnb "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_je_jz(u8 opcode_dw,
+decode_je_jz(BitNamesForEncodings *bits,
              void *file,
              buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("je "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jne_jnz(u8 opcode_dw,
+decode_jne_jnz(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jne "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jbe_jna(u8 opcode_dw,
+decode_jbe_jna(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jbe "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jnbe_ja(u8 opcode_dw,
+decode_jnbe_ja(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("ja "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_js(u8 opcode_dw,
+decode_js(BitNamesForEncodings *bits,
           void *file,
           buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("js "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jns(u8 opcode_dw,
+decode_jns(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jns "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jp_jpe(u8 opcode_dw,
+decode_jp_jpe(BitNamesForEncodings *bits,
               void *file,
               buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jp "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jnp_jpo(u8 opcode_dw,
+decode_jnp_jpo(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jnp "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jl_jnge(u8 opcode_dw,
+decode_jl_jnge(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jl "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jnl_jge(u8 opcode_dw,
+decode_jnl_jge(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jnl "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jle_jng(u8 opcode_dw,
+decode_jle_jng(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jle "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jnle_jg(u8 opcode_dw,
+decode_jnle_jg(BitNamesForEncodings *bits,
                void *file,
                buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jg "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_immed(u8 opcode_dw,
+decode_immed(BitNamesForEncodings *bits,
              void *file,
              buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	bits->ds = bits->opcode & MASK_S;
+	bits->w  = bits->opcode & MASK_W;
+
+	os_readfile(&bits->mod, &bits->ip, file, 1);
+	bits->opcode = (bits->mod & MASK_REG) >> SHIFT_REG;
+	bits->rm = bits->mod & MASK_RM;
+	bits->mod >>= SHIFT_MOD;
+	calc_dasm_rm(bits, file);
+	calc_dasm_immed(bits, file, check_sw_bits_01(bits));
+
+	switch(bits->opcode) {
+		case 0: { buf8_append(b, s8("add ")); } break;
+		case 1: { buf8_append(b, s8("or "));  } break;
+		case 2: { buf8_append(b, s8("adc ")); } break;
+		case 3: { buf8_append(b, s8("sbb ")); } break;
+		case 4: { buf8_append(b, s8("and ")); } break;
+		case 5: { buf8_append(b, s8("sub ")); } break;
+		case 6: { buf8_append(b, s8("xor ")); } break;
+		case 7: { buf8_append(b, s8("cmp ")); } break;
+		default: { return SIM86_PANIC; }
+	}
+
+	if (bits->mod == MASK_MOD_REG)
+		print_dasm_reg(bits->w, bits->rm, b);
+	else
+		print_dasm_rm(bits, b);
+	print_dasm_separator(b);
+	print_dasm_immed(bits, b);
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_test(u8 opcode_dw,
+decode_test(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	// NOTE - BEWARE! Table 4-12 8086 Instruction Encoding
+	//        Is WRONG for Reg/RM Test!!!! (0x10, 0x11, 0x12 & 0x13)
+	//
+	//        Refer to Table 4-13. Machine Instruction Decoding Guide!
+	//        (0x84, 0x85).
+	//
+	//        Table 4-14 Machine Instruction Encoding Matrix backs up
+	//        Table 4-13.
+	buf8_append(b, s8("test "));
+
+	bits->w = bits->opcode & MASK_W;
+	if (flag_equ(bits->opcode, MASK_TEST_RM_REG)) {
+		bits->ds = bits->opcode & MASK_D;
+		return decode_dasm_reg_tofrom_rm(bits, file, b);
+	}
+
+	calc_dasm_immed(bits, file, bits->w);
+	print_dasm_reg(bits->w, 0x00, b);
+	print_dasm_separator(b);
+	buf8_appendusz(b, bits->data.U16);
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_xchg(u8 opcode_dw,
+decode_xchg(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("xchg "));
+
+	if (flag_equ(bits->opcode, MASK_XCHG_ACCUM)) {
+		bits->reg = bits->opcode & MASK_XCHG_REG;
+
+		print_dasm_reg(1, 0x00, b);
+		print_dasm_separator(b);
+		print_dasm_reg(1, bits->reg, b);
+	}
+	else {
+		bits->ds = 0;
+		bits->w = bits->opcode & MASK_W;
+		return decode_dasm_reg_tofrom_rm(bits, file, b);
+	}
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_mov(u8 opcode_dw,
+decode_mov(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
 	buf8_append(b, s8("mov "));
-	if (flag_equ(opcode_dw, MOV_MASK_OPCODE_ITORG))
-		return mov_immed_to_reg(opcode_dw & 0x0F, file, b);
 
-	if (flag_equ(opcode_dw, MOV_MASK_OPCODE_ITORM))
-		return mov_immed_to_rm(opcode_dw & 0x01, file, b);
+	if (flag_equ(bits->opcode, MASK_MOV_ITORG))
+		return decode_dasm_reg_from_immed(bits, file, b);
+	if (flag_equ(bits->opcode, MASK_MOV_ITORM))
+		return decode_dasm_rm_from_immed(bits, file, b);
+	if (flag_equ(bits->opcode, MASK_MOV_ACCUM))
+		return decode_dasm_mem_tofrom_accum(bits, file, b);
 
-	if (flag_equ(opcode_dw, MOV_MASK_OPCODE_ACCUM)) {
-		return mov_memory_tofrom_accumulator((opcode_dw & MOV_MASK_D) >> 1,
-		                                     (opcode_dw & MOV_MASK_W),
-		                                     file,
-		                                     b);
+	bits->ds = bits->opcode & MASK_D;
+	if (flag_equ(bits->opcode, MASK_MOV_SEGMT))
+		return decode_dasm_sr_tofrom_rm(bits, file, b);
+
+	bits->w = bits->opcode & MASK_W;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
+}
+
+local int
+decode_lea(BitNamesForEncodings *bits,
+           void *file,
+           buf8 *b)
+{
+	buf8_append(b, s8("lea "));
+	unref(bits);
+
+	bits->ds = 1;
+	bits->w = 1;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
+}
+
+local int
+decode_cbw(BitNamesForEncodings *bits,
+           void *file,
+           buf8 *b)
+{
+	buf8_append(b, s8("cbw"));
+	unref(bits);
+	unref(file);
+
+	buf8_appendlf(b);
+	return SIM86_OK;
+}
+
+local int
+decode_cwd(BitNamesForEncodings *bits,
+           void *file,
+           buf8 *b)
+{
+	buf8_append(b, s8("cwd"));
+	unref(bits);
+	unref(file);
+
+	buf8_appendlf(b);
+	return SIM86_OK;
+}
+
+local int
+decode_call(BitNamesForEncodings *bits,
+            void *file,
+            buf8 *b)
+{
+	buf8_append(b, s8("call "));
+
+	if (flag_equ(bits->opcode, MASK_CALL_DISGMT)) {
+		os_readfile(bits->disp.U8, &bits->ip, file, 2);
+		os_readfile(bits->data.U8, &bits->ip, file, 2);
+
+		buf8_appendusz(b, bits->data.U16);
+		buf8_appendbyte(b, ':');
+		buf8_appendusz(b, bits->disp.U16);
+	}
+	else {
+		os_readfile(bits->data.U8, &bits->ip, file, 2);
+		buf8_appendusz(b, bits->data.U16 + bits->ip);
 	}
 
-	if (flag_equ(opcode_dw, MOV_MASK_OPCODE_SEGMT))
-		return SIM86_NOT_IMPLEMENTED;
-
-	return mov_regrm_tofrom_reg((opcode_dw & MOV_MASK_D) >> 1,
-	                            (opcode_dw & MOV_MASK_W),
-	                            file,
-	                            b);
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_lea(u8 opcode_dw,
-           void *file,
-           buf8 *b)
-{
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
-}
-
-local int
-decode_cbw(u8 opcode_dw,
-           void *file,
-           buf8 *b)
-{
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
-}
-
-local int
-decode_cwd(u8 opcode_dw,
-           void *file,
-           buf8 *b)
-{
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
-}
-
-local int
-decode_call(u8 opcode_dw,
+decode_wait(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("wait"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_wait(u8 opcode_dw,
-            void *file,
-            buf8 *b)
-{
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
-}
-
-local int
-decode_pushf(u8 opcode_dw,
+decode_pushf(BitNamesForEncodings *bits,
              void *file,
              buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("pushf"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_popf(u8 opcode_dw,
+decode_popf(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("popf"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_sahf(u8 opcode_dw,
+decode_sahf(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("sahf"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_lahf(u8 opcode_dw,
+decode_lahf(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("lahf"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
+
 }
 
 local int
-decode_movs(u8 opcode_dw,
+decode_movs(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("movs"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	if (bits->opcode & MASK_W)
+		buf8_appendbyte(b, 'w');
+	else
+		buf8_appendbyte(b, 'b');
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_cmps(u8 opcode_dw,
+decode_cmps(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("cmps"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	if (bits->opcode & MASK_W)
+		buf8_appendbyte(b, 'w');
+	else
+		buf8_appendbyte(b, 'b');
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_stos(u8 opcode_dw,
+decode_stos(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("stos"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	if (bits->opcode & MASK_W)
+		buf8_appendbyte(b, 'w');
+	else
+		buf8_appendbyte(b, 'b');
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_lods(u8 opcode_dw,
+decode_lods(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("lods"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	if (bits->opcode & MASK_W)
+		buf8_appendbyte(b, 'w');
+	else
+		buf8_appendbyte(b, 'b');
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_scas(u8 opcode_dw,
+decode_scas(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("scas"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	if (bits->opcode & MASK_W)
+		buf8_appendbyte(b, 'w');
+	else
+		buf8_appendbyte(b, 'b');
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_ret(u8 opcode_dw,
+decode_ret(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("ret"));
+
+	if (flag_equ(bits->opcode, MASK_RET_ISGMT))
+		buf8_appendbyte(b, 'f');
+
+	if ((bits->opcode & MASK_RET_SP) == 0x02) {
+		calc_dasm_immed(bits, file, 1);
+
+		buf8_appendbyte(b, ' ');
+		buf8_appendisz(b, bits->data.I16);
+	}
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_les(u8 opcode_dw,
+decode_les(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("les "));
+
+	bits->ds = 1;
+	bits->w = 1;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_lds(u8 opcode_dw,
+decode_lds(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("lds "));
+
+	bits->ds = 1;
+	bits->w = 1;
+	return decode_dasm_reg_tofrom_rm(bits, file, b);
 }
 
 local int
-decode_int(u8 opcode_dw,
+decode_int(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("int"));
+
+	if (flag_equ(bits->opcode, MASK_INT_TYPE_S)) {
+		os_readfile(bits->data.U8, &bits->ip, file, 1);
+
+		buf8_appendbyte(b, ' ');
+		buf8_appendusz(b, bits->data.U8[0]);
+	}
+	else
+		buf8_appendbyte(b, '3');
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_into(u8 opcode_dw,
+decode_into(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("into"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_iret(u8 opcode_dw,
+decode_iret(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("iret"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_shift(u8 opcode_dw,
+decode_shift(BitNamesForEncodings *bits,
              void *file,
              buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	bits->w = bits->opcode & MASK_W;
+	bits->ds = bits->opcode & MASK_D;
+	os_readfile(&bits->mod, &bits->ip, file, 1);
+
+	bits->rm = bits->mod & MASK_RM;
+	bits->opcode = (bits->mod & MASK_REG) >> SHIFT_REG;
+	bits->mod >>= SHIFT_MOD;
+	calc_dasm_rm(bits, file);
+
+	switch(bits->opcode) {
+		case SHFT_ROL: { print_dasm_rm_grp(bits, "rol ", b); } break;
+		case SHFT_ROR: { print_dasm_rm_grp(bits, "ror ", b); } break;
+		case SHFT_RCL: { print_dasm_rm_grp(bits, "rcl ", b); } break;
+		case SHFT_RCR: { print_dasm_rm_grp(bits, "rcr ", b); } break;
+		case SHFT_SHL: { print_dasm_rm_grp(bits, "shl ", b); } break;
+		case SHFT_SHR: { print_dasm_rm_grp(bits, "shr ", b); } break;
+		case SHFT_SAR: { print_dasm_rm_grp(bits, "sar ", b); } break;
+		default:       { return SIM86_PANIC; }
+	}
+	print_dasm_separator(b);
+
+	if (bits->ds)
+		buf8_append(b, s8("cl"));
+	else
+		buf8_appendbyte(b, '1');
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_aam(u8 opcode_dw,
+decode_aam(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("aam"));
+
+	os_readfile(&bits->mod, &bits->ip, file, 1);
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_aad(u8 opcode_dw,
+decode_aad(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("aad"));
+
+	os_readfile(&bits->mod, &bits->ip, file, 1);
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_xlat(u8 opcode_dw,
+decode_xlat(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("xlat"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_esc(u8 opcode_dw,
+decode_esc(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	unref(bits);
 	unref(file);
 	unref(b);
 	return SIM86_NOT_IMPLEMENTED;
 }
 
 local int
-decode_loopnz_loopne(u8 opcode_dw,
+decode_loopnz_loopne(BitNamesForEncodings *bits,
                      void *file,
                      buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("loopnz "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_loopz_loope(u8 opcode_dw,
+decode_loopz_loope(BitNamesForEncodings *bits,
                    void *file,
                    buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("loopz "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_loop(u8 opcode_dw,
+decode_loop(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("loop "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_jcxz(u8 opcode_dw,
+decode_jcxz(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jcxz "));
+	return decode_dasm_relative_addr(bits, file ,b);
 }
 
 local int
-decode_in(u8 opcode_dw,
-         void *file,
-         buf8 *b)
+decode_in(BitNamesForEncodings *bits,
+          void *file,
+          buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("in "));
+
+	bits->w = bits->opcode & MASK_W;
+	print_dasm_reg(bits->w, 0, b);
+	print_dasm_separator(b);
+
+	if (flag_equ(bits->opcode, MASK_IN_VARPORT))
+		print_dasm_reg(1, 0x2, b);
+	else
+	{
+		os_readfile(bits->data.U8, &bits->ip, file, 1);
+		buf8_appendisz(b, bits->data.I8[0]);
+	}
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_out(u8 opcode_dw,
+decode_out(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("out "));
+
+	if (flag_equ(bits->opcode, MASK_OUT_VARPORT))
+		print_dasm_reg(1, 0x2, b);
+	else
+	{
+		os_readfile(bits->data.U8, &bits->ip, file, 1);
+		buf8_appendisz(b, bits->data.I8[0]);
+	}
+
+	bits->w = bits->opcode & MASK_W;
+	print_dasm_separator(b);
+	print_dasm_reg(bits->w, 0, b);
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_jmp(u8 opcode_dw,
+decode_jmp(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	buf8_append(b, s8("jmp "));
+
+	if (flag_equ(bits->opcode, MASK_JMP_DISGMT)) {
+		os_readfile(bits->disp.U8, &bits->ip, file, 2);
+		os_readfile(bits->data.U8, &bits->ip, file, 2);
+
+		buf8_appendusz(b, bits->data.U16);
+		buf8_appendbyte(b, ':');
+		buf8_appendusz(b, bits->disp.U16);
+	}
+	else if (flag_equ(bits->opcode, MASK_JMP_DWSGMTS)) {
+		os_readfile(bits->data.U8, &bits->ip, file, 1);
+		buf8_appendusz(b, bits->data.U16 + bits->ip);
+	}
+	else {
+		os_readfile(bits->data.U8, &bits->ip, file, 2);
+		buf8_appendusz(b, bits->data.U16 + bits->ip);
+	}
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_lock(u8 opcode_dw,
+decode_lock(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("lock "));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	return SIM86_OK;
 }
 
 local int
-decode_rep(u8 opcode_dw,
+decode_rep(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("rep "));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	return SIM86_OK;
 }
 
 local int
-decode_hlt(u8 opcode_dw,
+decode_hlt(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("hlt"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_cmc(u8 opcode_dw,
+decode_cmc(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("cmc"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_grp1(u8 opcode_dw,
+decode_grp1(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	bits->w = bits->opcode & MASK_W;
+	os_readfile(&bits->mod, &bits->ip, file, 1);
+
+	bits->rm = bits->mod & MASK_RM;
+	bits->opcode = (bits->mod & MASK_REG) >> SHIFT_REG;
+	bits->mod >>= SHIFT_MOD;
+	calc_dasm_rm(bits, file);
+
+	switch(bits->opcode) {
+		case GRP1_TEST: {
+			calc_dasm_immed(bits, file, bits->w);
+
+			print_dasm_rm_grp(bits, "test ", b);
+			print_dasm_separator(b);
+			buf8_appendisz(b, bits->data.I16);
+		} break;
+
+		case GRP1_NOT:  { print_dasm_rm_grp(bits, "not ", b); }  break;
+		case GRP1_NEG:  { print_dasm_rm_grp(bits, "neg ", b); }  break;
+		case GRP1_MUL:  { print_dasm_rm_grp(bits, "mul ", b); }  break;
+		case GRP1_IMUL: { print_dasm_rm_grp(bits, "imul ", b); } break;
+		case GRP1_DIV:  { print_dasm_rm_grp(bits, "div ", b); }  break;
+		case GRP1_IDIV: { print_dasm_rm_grp(bits, "idiv ", b); } break;
+		default: { return SIM86_PANIC; }
+	}
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_clc(u8 opcode_dw,
+decode_clc(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("clc"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_stc(u8 opcode_dw,
+decode_stc(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("stc"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_cli(u8 opcode_dw,
+decode_cli(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("cli"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_sti(u8 opcode_dw,
+decode_sti(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("sti"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_cld(u8 opcode_dw,
+decode_cld(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("cld"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_std(u8 opcode_dw,
+decode_std(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
-	unref(opcode_dw);
+	buf8_append(b, s8("std"));
+	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 local int
-decode_grp2(u8 opcode_dw,
+decode_grp2(BitNamesForEncodings *bits,
             void *file,
             buf8 *b)
 {
-	unref(opcode_dw);
-	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+	bits->w = bits->opcode & MASK_W;
+	os_readfile(&bits->mod, &bits->ip, file, 1);
+
+	bits->rm = bits->mod & MASK_RM;
+	bits->opcode = (bits->mod & MASK_REG) >> SHIFT_REG;
+	bits->mod >>= SHIFT_MOD;
+	calc_dasm_rm(bits, file);
+
+	switch(bits->opcode) {
+		case GRP2_INC:  { print_dasm_rm_grp(bits, "inc ", b); }  break;
+		case GRP2_DEC:  { print_dasm_rm_grp(bits, "dec ", b); }  break;
+		case GRP2_PUSH: { print_dasm_rm_grp(bits, "push ", b); } break;
+
+		case GRP2_CALL_IWSGMT: { print_dasm_rm_grp(bits, "call ", b); } break;
+		case GRP2_CALL_IISGMT: { print_dasm_rm_grp(bits, "call far ", b); } break;
+		case GRP2_JMP_IWSGMT:  { print_dasm_rm_grp(bits, "jmp ", b); } break;
+		case GRP2_JMP_IISGMT:  { print_dasm_rm_grp(bits, "jmp far ", b); } break;
+
+		default: { return SIM86_PANIC; }
+	}
+
+	buf8_appendlf(b);
+	return SIM86_OK;
 }
 
 // Note: This represents the machine instruction encoding matrix, described

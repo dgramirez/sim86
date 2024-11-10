@@ -1,12 +1,14 @@
 ## 8086 Decoder ##
 (Under Development)
 
-In the current state of this repository, this is an i8086 decoder that only
-decodes mov. I will be following the [Computer Enhance] [1] class, which
-has the students do a simple 8086 /8088 simulator. This repository will be
-updated for each homework that I've completed, and perhaps more.
+In the current state of this repository, this is an i8086 decoder that
+decodes almost all instructions. I will be following the [Computer Enhance]
+[1] class, which has the students do a simple 8086 /8088 simulator. This
+repository will be updated for each homework that I've completed, and
+perhaps more.
 
-Latest Update: 2. Decoding Multiple Instructions and Suffixes
+Latest Update: 3. Opcode Patterns in 8086 Arithmetic
+(Completionist HW Finished!)
 
 ## Build ##
 Currently, Windows is the only platform with a build script. You can double
@@ -56,5 +58,15 @@ This will decode the binary and print it onto the screen.
 * [All]: *Untested: No Build Scripts*
 * Note - I am banking that the standard library version covers libc and musl. Unfortunately: *Untested*.
 
-[1]: https://www.computerenhance.com "Computer Enhance"
+## Additional Notes ##
+Despite the completionist homework being done for the decoder, there were
+certain instructions that nasm wouldn't accept (esc is the most noticable
+one.) Upon finishing this section of the course, I will take a look at an
+8088 test suite [2], making a program to get the instructions the tests
+contain and testing those instructions against this program to make it
+robust.  
 
+As of now, the tests that I'm conducting is from the course itself.
+
+[1]: https://www.computerenhance.com "Computer Enhance"
+[2]: https://github.com/SingleStepTests/8088 "8088 test suite"

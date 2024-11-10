@@ -12,8 +12,11 @@
 // Common Functions
 #include "buffer.h"
 
-// Program Functionality (C Files)
+// Sim86 Header Files
+#include "i8086.h"
 #include "i8086_decode_helpers.h"
+
+// Sim86 C Files
 #include "i8086_decode.c"
 #include "i8086.c"
 

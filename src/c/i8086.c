@@ -15,10 +15,10 @@ i8086_main(int argc,
            char **argv,
            buf8 *b)
 {
+	BitNamesForEncodings bits;
 	void *file;
 	b32 err;
 	s8 mode;
-	u8 opcode;
 
 	err = validate_pfn(b,
 	                   (void*)os_write,
@@ -74,6 +74,7 @@ i8086_main(int argc,
 		return SIM86_PANIC;
 	}
 
+	memzero_128((char*)(&bits));
 	if (s8eq(mode, s8("decode"))) {
 		buf8_appendbyte(b, ';');
 		buf8_appendbyte(b, ' ');
@@ -85,14 +86,15 @@ i8086_main(int argc,
 		buf8_appendlf(b);
 		buf8_appendlf(b);
 
-		while (!os_readfile(&opcode, file, 1)) {
-			if (i8086_fn_decodes[opcode](opcode, file, b)) {
+		while (!os_readfile(&bits.opcode, &bits.ip, file, 1)) {
+			if (i8086_fn_decodes[bits.opcode](&bits, file, b)) {
 				buf8_flush(b);
 
 				buf8_appendlf(b);
 				buf8_appendlf(b);
 				buf8_append(b, s8("; PANIC OCCURRED ON OPCODE: "));
-				buf8_appendhex(b, opcode);
+				buf8_appendhex(b, bits.opcode);
+				buf8_appendlf(b);
 
 				return SIM86_PANIC;
 			}

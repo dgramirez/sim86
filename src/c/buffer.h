@@ -40,6 +40,20 @@ s8eq(s8 s1,
 }
 
 local void
+memzero_128(char *m)
+{
+	usz *m_sz;
+
+	m_sz = (usz *)m;
+	m_sz[0] = 0;
+	m_sz[1] = 0;
+	#if EXE_ARCH == 32
+		m_sz[2] = 0;
+		m_sz[3] = 0;
+	#endif
+}
+
+local void
 buf8_flush(buf8 *b)
 {
 	b->err |= ((isz)b->fd < 0);
