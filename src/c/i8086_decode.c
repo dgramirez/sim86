@@ -910,10 +910,11 @@ decode_esc(BitNamesForEncodings *bits,
            void *file,
            buf8 *b)
 {
+	buf8_append(b, s8("esc"));
 	unref(bits);
 	unref(file);
-	unref(b);
-	return SIM86_NOT_IMPLEMENTED;
+
+	return SIM86_OK;
 }
 
 local int

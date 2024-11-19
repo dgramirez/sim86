@@ -4,8 +4,9 @@ void
 _start()
 {
 	buf8 b = {0};
-	s8 s8tmp = {0};
+	buf8 mem86 = {0};
 	c8 *argv[3];
+	u8 *mem;
 	i32 argc;
 	i32 ret;
 
@@ -13,32 +14,24 @@ _start()
 	os_openfile = win32_openfile;
 	os_readfile = win32_readfile;
 
-	b.cap = MB(1);
-	b.data = VirtualAlloc(0,
-	                      b.cap,
-	                      MEM_COMMIT | MEM_RESERVE,
-	                      PAGE_READWRITE);
-	if (!b.data) {
+	mem = VirtualAlloc(0, MB(3), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	if (!mem) {
 		win32_print(s8("ERROR: Unable to allocate 1 MB for sim86.\r\n"));
 		win32_pause();
 		ExitProcess((u32)-1);
 	}
+
+	mem86.cap = MB(1);
+	mem86.data = mem;
+
+	b.cap = MB(1);
+	b.data = mem86.data + mem86.cap;
 	b.fd = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	win32_getargs(&argc, (char **)argv);
+	win32_getargs(&argc, (char **)argv, b.data + b.cap, KB(4));
 	ret = i8086_main(argc, (char **)argv, &b);
-	if (ret == SIM86_OS_WRITE_IS_NULL_OR_STUB) {
-		s8tmp.data = b.data;
-		s8tmp.len = b.len;
-		win32_print(s8tmp);
-		win32_pause();
-		ExitProcess(ret);
-	}
-
 	if (ret < 0) {
-		s8tmp.data = b.data;
-		s8tmp.len = b.len;
-		win32_print(s8tmp);
+		win32_print(b.str);
 		win32_pause();
 	}
 	else
@@ -123,20 +116,15 @@ win32_pause()
 
 local void*
 win32_getargs(i32 *argc,
-              char **argv)
+              char **argv,
+              void *buffer,
+              int size)
 {
 	buf8 bargv = {0};
 	LPWSTR *argvw;
 
-	bargv.cap  = KB(4);
-	bargv.data = VirtualAlloc(0,
-	                          bargv.cap,
-	                          MEM_COMMIT | MEM_RESERVE,
-	                          PAGE_READWRITE);
-	if (!bargv.data) {
-		win32_print(s8("ERROR: Unable to allocate 4 KB for argv.\r\n"));
-		ExitProcess((u32)-1);
-	}
+	bargv.cap  = size;
+	bargv.data = buffer;
 
 	argv[0] = "";
 	argv[1] = (char *)bargv.data;

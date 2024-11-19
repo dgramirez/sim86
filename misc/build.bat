@@ -11,6 +11,8 @@ set SIM86_FILEPATH=%~4
 if ["%~1"] == ["c"]     ( goto :cleanup )
 if ["%~1"] == ["clean"] ( goto :cleanup )
 if ["%~1"] == ["xp"]    ( goto :xp )
+if ["%~1"] == ["a"]     ( if ["%~2"] == [""] ( goto :build_all ) )
+if ["%~1"] == ["all"]     ( if ["%~2"] == [""] ( goto :build_all ) )
 call :call_validate_args %~1 %~2 %~3
 
 set OUT=
@@ -249,18 +251,19 @@ goto :run_end
 
 		:: TODO - These are independent because win32-config handled the
 		::        OUT var for run & test (As of Oct. 28th 2024, It doesn't
-		::        know which version of the executable to execute. This
-		::        should eventually be fixed!)
+		::        know which version of the executable to execute.
+		set STATIC_OUT=%ROOT%\out\%X_COMPILER%-xp-%X_ARCH%
+
 		set BUILD=%DEBREL%
-		set OUT=%ROOT%\out\%X_COMPILER%-xp-%X_ARCH%\debrel
+		set OUT=%STATIC_OUT%\debrel
 		call :debrel
 
 		set BUILD=%DEBUG%
-		set OUT=%ROOT%\out\%X_COMPILER%-xp-%X_ARCH%\debug
+		set OUT=%STATIC_OUT%\debug
 		call :debug
 
 		set BUILD=%RELEASE%
-		set OUT=%ROOT%\out\%X_COMPILER%-xp-%X_ARCH%\release
+		set OUT=%STATIC_OUT%\release
 		call :release
 	:xp_finish
 	endlocal
@@ -288,6 +291,22 @@ goto :eof
 
 	set CL_FLAGS=%CL_FLAGS% /D"WINVER=0x0502" /D"_WIN32_WINNT=0x0502" ^
 				 /D"NTDDI_VERSION=0x05020200"
+goto :eof
+
+:build_all
+	echo ===================
+	echo = Zig Compilation =
+	echo ===================
+	echo.
+	call :recurse_build a win32-zigcc
+	call :recurse_build a std-zigcc
+	call :recurse_build a win32-msvc
+	call :recurse_build a std-msvc
+	call :recurse_build xp
+goto :eof
+
+:recurse_build
+	call "%ROOT%\misc\build.bat" %1 %2
 goto :eof
 
 :cleanup

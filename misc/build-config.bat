@@ -55,7 +55,7 @@ goto :bad_arg1
 
 	set USE_MSVC=1
 	set CL_FLAGS=/EHa- /fp:except- /fp:fast /GL- /Gm- /GR- /GS- /W4 /WX ^
-	             /Gs2147483647 /nologo
+	             /Gs2147483647 /nologo /wd4201
 
 	:: Note - Keep Subsystem as last parameter for Windows XP
 	set LK_FLAGS=/WX /STACK:0x200000,0x200000 /INCREMENTAL:NO ^

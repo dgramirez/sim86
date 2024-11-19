@@ -9,7 +9,9 @@
 #include <stdio.h>
 #include <string.h>
 
-// Platform-Specifics functions
+////////////////////////
+// Required for sim86 //
+////////////////////////
 local void *
 std_openfile(char *filepath);
 

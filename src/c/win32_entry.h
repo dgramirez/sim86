@@ -10,17 +10,9 @@
 	unsigned int _tls_index = 0;
 #endif
 
-// Platform-Specific Functions
-local void
-win32_pause();
-
-local void
-win32_print(s8 s);
-
-local void *
-win32_getargs(i32 *argc,
-              char **argv);
-
+////////////////////////
+// Required for sim86 //
+////////////////////////
 local void *
 win32_openfile(char *filepath);
 
@@ -32,6 +24,22 @@ win32_readfile(u8 *out,
 
 local void
 win32_write(buf8 *b);
+
+////////////////////////////
+// Win32 Helper Functions //
+////////////////////////////
+
+local void
+win32_pause();
+
+local void
+win32_print(s8 s);
+
+local void *
+win32_getargs(i32 *argc,
+              char **argv,
+              void *buffer,
+              int size);
 
 #endif // SIM86_SRC_C_WIN32_ENTRY_H
 
